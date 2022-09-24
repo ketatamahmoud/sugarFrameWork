@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "classmap": [
+            "./"
+        ]
+    },
+    "require": {
+        "twig/twig": "^3.3",
+      "ext-pdo": "*"
+    }
+}
