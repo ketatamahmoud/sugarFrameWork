@@ -1,0 +1,10 @@
+    /**
+     * @param {{type}} ${{param}}
+     */
+    public function set{{functionName}}({{type}} ${{param}}): self
+    {
+        $this->{{param}} = ${{param}};
+        return $this ;
+    }
+
+

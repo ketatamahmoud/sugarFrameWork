@@ -1,0 +1,10 @@
+    /**
+     * @return {{Model}}[]
+     */
+    public function get{{functionName}}() : array
+    {
+        if(empty($this->{{atrubite}}))
+            $this->{{atrubite}}={{Model}}::getBy(['{{ref1}}'=>$this->{{ref2}}]);
+        return $this->{{atrubite}};
+    }
+

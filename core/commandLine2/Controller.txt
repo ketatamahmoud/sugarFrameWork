@@ -1,0 +1,12 @@
+<?php
+
+namespace App\Controllers;
+
+use Core\AbstractController;
+
+class {{ControllerName}} extends AbstractController
+{
+
+{{context}}
+
+}

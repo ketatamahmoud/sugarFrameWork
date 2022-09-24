@@ -1,0 +1,11 @@
+    /**
+     * Show the home page.
+     */
+    public function {{ActionName}}()
+    {
+
+
+
+    {{Return}}
+    }
+       

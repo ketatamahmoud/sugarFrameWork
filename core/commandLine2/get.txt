@@ -1,0 +1,9 @@
+    /**
+     * @return {{returnType}}
+     */
+    public function get{{functionName}}() : {{returnType}}
+    {
+        return $this->{{atrubu}};
+    }
+
+
