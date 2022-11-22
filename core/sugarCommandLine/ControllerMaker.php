@@ -3,56 +3,51 @@
 class ControllerMaker
 {
 
-    static function isExist($controllerName)
+    public static function isExist($controllerName): bool
     {
         $directory = __DIR__ . '/../../app/controllers';
-        $controllerName = $controllerName . ".php";
+        $controllerName .= "Controller.php";
         $scanned_directory = array_diff(scandir($directory), array('..', '.'));
-        if (in_array($controllerName, $scanned_directory)) {
+        if (in_array($controllerName, $scanned_directory, true)) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     static function makeController($controllerName, $action)
     {
-        $controllerName = ucfirst($controllerName);
-        $directory = __DIR__ . '/../../app/controllers/' . $controllerName . 'Controller' . ".php";
-
-        if (self::isExist($controllerName)) {
-
+        $colors = new Colors();
+        $controllerName = ucfirst($controllerName).'Controller';
+        $directory = __DIR__ . '/../../app/controllers/' . $controllerName . ".php";
+        if (self::isExist($controllerName) === true) {
+            echo $colors->getColoredString("Controller already exists!  \n", "red");
         } else {
-            $controllerFileTemplet = fopen(__DIR__ ."/controller.txt", "r");
-            $contents = stream_get_contents($controllerFileTemplet);
-
-           
+            $controllerFileTemplate = fopen(__DIR__ . "/controller.txt", "r");
+            $contents = stream_get_contents($controllerFileTemplate);
             $contents = str_replace("{{ControllerName}}", $controllerName, $contents);
-
             $function = self::createFuction($action);
             $contents = str_replace("{{context}}", $function, $contents);
             $controllerFile = fopen($directory, "w+");
-
             fwrite($controllerFile, $contents);
-
+            $colors->getColoredStringSuccess("Controller created successfully!");
         }
     }
 
     static function createFuction($action)
     {
-        $actionFileTemplet = fopen(__DIR__ ."/action.txt", "r");
-
-        $function = stream_get_contents($actionFileTemplet);
+        $actionFileTemplate = fopen(__DIR__ . "/action.txt", "r");
+        $function = stream_get_contents($actionFileTemplate);
         $function = str_replace("{{ActionName}}", $action, $function);
         $colors = new Colors();
-        print_r($colors->getColoredString("Would you like to add a render or redirect  \n", "cyan"));
+        print_r($colors->getColoredString("Would you like to add a render or redirect methods? \n", "cyan"));
         print_r($colors->getColoredString("[0] =>NO \n", "cyan"));
         print_r($colors->getColoredString("[1] =>render \n", "cyan"));
         print_r($colors->getColoredString("[2] =>redirect \n", "cyan"));
         print_r($colors->getColoredString("=>  ", "cyan"));
         do {
             if (isset($act)) {
-                $colors->warning('you should choose between this option');
+                $colors->warning('You should choose between those options.');
                 print_r($colors->getColoredString("[0] =>NO \n", "cyan"));
                 print_r($colors->getColoredString("[1] =>render \n", "cyan"));
                 print_r($colors->getColoredString("[2] =>redirect \n", "cyan"));
@@ -63,13 +58,11 @@ class ControllerMaker
         switch ($act) {
             case 0:
                 $function = str_replace("{{Return}}", '', $function);
-                break ;
+                break;
             case 1:
-                $dir = "../../app/views";
-
-
-                $result = VieuxMaker::getAllVieux($dir);
-                $views=$result["vieux"];
+                $dir = __DIR__ . "/../../app/views/";
+                $result = ViewMaker::getAllViews($dir);
+                $views = $result["view"];
                 foreach ($views as $key => $view) {
 
                     print_r($colors->getColoredString("[" . $key . "] => " . $view . "\n", "cyan"));
@@ -77,12 +70,16 @@ class ControllerMaker
                 }
                 print_r($colors->getColoredString("[NEW] => to create a new view \n", "cyan"));
 
-                $reandVieus = readline("==> ");
-                if ($reandVieus >= 0 && $reandVieus <= count($views)) {
-                    $function = str_replace("{{Return}}", '$this->render("' . $views[$reandVieus] . '");', $function);
+                $readView = readline("==> ");
+                if ($readView >= 0 && $readView <= count($views)) {
+                    $function = str_replace("{{Return}}", '$this->render("' . $views[$readView] . '");', $function);
 
-                } else
-                { $function = str_replace("{{Return}}", '$this->render();', $function);}
+                } else {
+                    var_dump('new');
+                    $viewMaker = new ViewMaker();
+                    $viewName = $viewMaker::addView();
+                    $function = str_replace("{{Return}}", '$this->render("'.$viewName.".html.twig".'");', $function);
+                }
                 break;
 
             case 2:

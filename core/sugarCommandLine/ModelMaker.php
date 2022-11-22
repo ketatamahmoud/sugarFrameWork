@@ -9,7 +9,7 @@ class ModelMaker
 
     static function testConnection()
     {
-        $config = require "../../config.php";
+        $config = require __DIR__."/../../config.php";
         $config = $config["database"];
         if (is_null(self::$pdo)) {
         }
@@ -27,7 +27,7 @@ class ModelMaker
     static function makeModel()
     {
 
-        $config = require "../../config.php";
+        $config = require __DIR__."/../../config.php";
         $config = $config["database"];
 
         if (self::testConnection()) {
@@ -91,12 +91,15 @@ WHERE
             $tabelName = ucfirst($tabelName);
             if (!file_exists("../../app/model/" . $tabelName)) {
 
-                mkdir($directory . $tabelName, 0700, true);
+                if (!mkdir($concurrentDirectory = $directory . $tabelName, 0700, true) && !is_dir($concurrentDirectory)) {
+                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+                }
             }
-            $handle = fopen("model.txt", "a+");
+            $handle = fopen(__DIR__."/model.txt", "r");
             $contents = stream_get_contents($handle);
+
             $contents = str_replace("{{ModelName}}", $tabelName, $contents);
-            $myfile = fopen($directory . $tabelName . "/" . $tabelName, "w");
+            $myfile = fopen($directory . $tabelName . "/" . $tabelName, "w+");
             fwrite($myfile, $contents);
         }
     }
@@ -130,7 +133,7 @@ WHERE
 
 
             } elseif ((strtoupper(strtoupper($item["Type"])) == "DATE") || (strtoupper($item["Type"]) == " TIME") || (strtoupper($item["Type"]) == " DATETIME")) {
-                $contents = $contents . "protected " . "DateType " . '$' . $item["Field"] . ";\n";
+                $contents = $contents . "protected " . "DateTime " . '$' . $item["Field"] . ";\n";
 
             } elseif ((strtoupper($item["Type"]) == "  FLOAT") || (strtoupper($item["Type"]) == "  DOUBLE")) {
                 $contents = $contents . "protected " . "float " . '$' . $item["Field"] . $default . "; \n";
@@ -153,10 +156,10 @@ WHERE
     {
         $directory = __DIR__ . '../../../app/model/' . ucfirst($tablName);
 
-        $getFile = fopen("get.txt", "a+");
+        $getFile = fopen(__DIR__."/get.txt", "a+");
         $getTemplet = stream_get_contents($getFile);
 
-        $setFile = fopen("set.txt", "a+");
+        $setFile = fopen(__DIR__."/set.txt", "a+");
         $setTemplet = stream_get_contents($setFile);
 
         $myfilecontext = fopen($directory . "/" . "context.txt", "w+");
@@ -169,7 +172,7 @@ WHERE
 
 
             } elseif ((strtoupper(strtoupper($item["Type"])) == "DATE") || (strtoupper($item["Type"]) == " TIME") || (strtoupper($item["Type"]) == " DATETIME")) {
-                $itemType = "DateType ";
+                $itemType = "DateTime";
 
             } elseif ((strtoupper($item["Type"]) == "  FLOAT") || (strtoupper($item["Type"]) == "  DOUBLE")) {
                 $itemType = "float ";
@@ -203,7 +206,7 @@ WHERE
 
         $data ="\nprivate  array $".$ref["TABLE_NAME"]."_OBJ =[] ;\n";
         fwrite($atrubiteFille,$data);
-        $getFileTemplet = fopen("superGet.txt", "a+");
+        $getFileTemplet = fopen(__DIR__."/superGet.txt", "a+");
         $get = stream_get_contents($getFileTemplet);
         $get=str_replace("{{Model}}",ucfirst($ref["TABLE_NAME"]),$get);
         $get=str_replace("{{functionName}}",ucfirst($ref["TABLE_NAME"])."_OBJ",$get);
@@ -248,7 +251,8 @@ WHERE
             $classFile=fopen($myClassDir, "w+");
 
             fwrite($classFile, $myClass);
-            if (PHP_OS === 'Windows')
+            var_dump(PHP_OS);
+            if (PHP_OS === 'WINNT')
             {
                 exec(sprintf("rd /s /q %s", escapeshellarg($directory)));
             }

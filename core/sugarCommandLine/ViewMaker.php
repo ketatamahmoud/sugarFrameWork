@@ -1,121 +1,117 @@
 <?php
 
 
-class VieuxMaker
+class ViewMaker
 {
 
-    static function getAllVieux($dir, $newFile = null)
+    public static function getAllViews($dir, $newFile = null): array
     {
         $files = array_diff(scandir($dir), array('..', '.'));
-
         $views = [];
-
-
         $base = [];
-
         foreach ($files as $key => $file) {
-            if ((strpos($file, '.html.twig') !== false) && ($file !== "base.html.twig")) {
+            if ((str_contains($file, '.html.twig')) && ($file !== "base.html.twig")) {
                 if ($newFile !== null) {
                     $file = $newFile . "/" . $file;
                 }
-
-                array_push($views, $file);
-
-
-            } elseif (strpos($file, '.html.twig') !== false) {
+                $views[] = $file;
+            } elseif (str_contains($file, '.html.twig')) {
                 if ($newFile !== null) {
                     $file = $newFile . "/" . $file;
                 }
-                array_push($base, $file);
-
+                $base[] = $file;
             } else {
-
-
-                $res = self::getAllVieux($dir, $file);
                 $dir .= "/" . $file;
-                $views = array_merge($views, $res["vieux"]);
-                array_merge($views, $res["base"]);
+                $res = self::getAllViews($dir, $file);
+                $views = array_merge($views, $res["view"]);
             }
         }
         return [
-            "vieux" => $views,
+            "view" => $views,
             "base" => $base
         ];
-
     }
 
 
-    static function addVieux()
+    static function addView()
     {
 
         $colors = new Colors();
-        $dir = "../../app/views";
-
+        $dir = __DIR__. "/../../app/views";
         $dir2 = self::getDir($dir, "views");
-        $base = self::getAllVieux($dir)["base"];
-        $vieuxFileTemplet = fopen("vieux.txt", "r");
+        var_dump("azertyuio");
+        var_dump($dir2);
+        var_dump("azertyuio");
+        $base = self::getAllViews($dir)["base"];
+        $viewFileTemplate = fopen(__DIR__."/view.txt", "r");
 
-        $vieux = stream_get_contents($vieuxFileTemplet);
-        print_r($colors->getColoredString(" Choose the Vieux Name  \n", "cyan"));
-        $vieuxName = readline("->");
+        $view = stream_get_contents($viewFileTemplate);
+        print_r($colors->getColoredString(" Choose the View Name  \n", "cyan"));
+        $viewName = readline("->");
 
 
-        print_r($colors->getColoredString(" Choose the base  \n", "cyan"));
-        foreach ($base as $key => $item) {
+        //print_r($colors->getColoredString(" Choose the base  \n", "cyan"));
+        /*foreach ($base as $key => $item) {
             print_r($colors->getColoredString("   [" . $key . "] => $item \n", "cyan"));
 
         }
         $act = readline("->");
-        if (intval($act) >= 0 && intval($act) >= count($base)) {
-
-            $vieux = str_replace("{{base}}", "/" . $dir . $base[intval($act)], $vieux);
-        } else
-            $vieux = str_replace("{{base}}", "", $vieux);
-        $vieuxFile = fopen($dir2 . "/" . $vieuxName . ".html.twig", "w+");
-        fwrite($vieuxFile, $vieux);
-
-
-
+        if ((int)$act >= 0 && (int)$act <= count($base)) {
+            //$view = str_replace("{{base}}", "'" . $dir . $base[(int)$act]."'", $view);
+            $view = str_replace("{{base}}", "", $view);
+        } else {
+            //$view = str_replace("{{base}}", "", $view);
+        }*/
+        $view = str_replace("{{base}}", "''", $view);
+        var_dump($dir2.'/'.$viewName.".html.twig");
+        $viewFile = fopen($dir2 . "/" . $viewName . ".html.twig", 'w');
+        fwrite($viewFile, $view);
+        return $viewName;
     }
 
-    static function getDir($dir, $new)
+    public static function getDir($dir, $new = null)
     {
         $colors = new Colors();
         print_r($colors->getColoredString("[0] => $new \n", "cyan"));
-
-
         $files = array_diff(scandir($dir), array('..', '.'));
-        $directer = [];
+        $directory = [];
         foreach ($files as $key => $file) {
 
-            if (strpos($file, '.html.twig') === false) {
-                array_push($directer, $file);
-                $last = array_key_last($directer) + 1;
+            if (!str_contains($file, '.html.twig')) {
+                $directory[] = $file;
+                $last = array_key_last($directory) + 1;
                 print_r($colors->getColoredString("   [" . $last . "] => $file \n", "cyan"));
             }
+            /*{
+                $dir .= "/" . $file;
+                $res = self::getDir($dir);
+                $directory = array_merge($directory, $res["view"]);
+            }*/
 
         }
         print_r($colors->getColoredString("   [N] => New director  \n", "cyan"));
 
         print_r("\n");
         $act = readline("==>");
-
-        if ($act == "0") {
-            return $dir;
-        } elseif ($act > 0 && $act <= count($directer) + 1) {
-            $act = intval($act) - 1;
-            $dir = $dir . "/" . $directer[$act];
-            self::getDir($dir, $directer[$act]);
-        } elseif ($act == "n") {
-            print_r($colors->getColoredString(" Name of the new director \n", "cyan"));
+        if ((string)$act === "n" || (string)$act === "N") {
+            print_r($colors->getColoredString(" Name of the new directory \n", "cyan"));
             $newDir = readline("==>");
-            $dir = $dir . "/" . $newDir;
-            mkdir($dir, 0777);
-            self::getDir($dir, $newDir);
+            $dir .= "/" . $newDir;
+            if (!mkdir($dir, 0777) && !is_dir($dir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
+            }
+            self::getDir($dir.'/', $newDir);
 
         }
-
-
+        elseif ((int)$act === 0) {
+            return $dir;
+        }
+        elseif ((int)$act > 0) {
+            $act = (int)$act-1 ;
+            $dir .= "/" . $directory[$act];
+            self::getDir($dir, $directory[$act]);
+        }
+        return $dir;
     }
 
 

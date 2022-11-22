@@ -20,7 +20,7 @@ class ConfigMaker
 
 
         if (!self::isExist()) {
-            echo $colors->getColoredString('____________________________________Create Your DB Config File___________________________________', 'cyan') . "\n";
+            echo $colors->getColoredString('____________________________________DataBase Configuration___________________________________', 'cyan') . "\n";
 
             $dbName = readline('your database name      :  ');
             $username = readline('username(root)          :  ');
@@ -59,7 +59,7 @@ class ConfigMaker
                 $colors->getColoredStringSuccess("YOUR CONFIGURATION IS OK");
             }
         } else {
-            echo $colors->getColoredString('____________________________________reconfigure Your DB Config File___________________________________', 'cyan') . "\n";
+            echo $colors->getColoredString('____________________________________Re-configure Your DataBase___________________________________', 'cyan') . "\n";
 
             $config = require __DIR__.'/../../config.php';
             $str = explode("=", $config['database']['connection'])[1];
@@ -103,7 +103,7 @@ class ConfigMaker
             fwrite($confFile, $text);
             fclose($confFile);
             if(self::isExist()){
-                $colors->getColoredStringSuccess("YOUR RECONFIGURATION IS OK");
+                $colors->getColoredStringSuccess("YOUR RE-CONFIGURATION IS OK");
             }
         }
 

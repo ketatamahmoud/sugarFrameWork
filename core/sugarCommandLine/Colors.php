@@ -73,7 +73,7 @@ class Colors
         echo "\n";
         $successMess = str_repeat(' ', 20) . $successMess . str_repeat(' ', 20);
         echo $this->getColoredString($text, null, "green") . "\n";
-        echo $this->getColoredString($successMess, null, "green") . "\n";
+        echo $this->getColoredString($successMess, null, "light-blue") . "\n";
         echo $this->getColoredString($text, null, "green") . "\n \n";
 
     }
