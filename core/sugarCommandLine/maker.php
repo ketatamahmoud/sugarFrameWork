@@ -48,7 +48,7 @@ while ($action != "q") {
         case "vieux":
             VieuxMaker::addVieux();
             break;
-        case "controller":
+        case "c":
             $controller = readline('==> Controller Name               :  ');
             $action = readline('==> Action                        :  ');
             ControllerMaker::makeController($controller, $action);

@@ -18,13 +18,14 @@ class ControllerMaker
     static function makeController($controllerName, $action)
     {
         $controllerName = ucfirst($controllerName);
-        $directory = __DIR__ . '/../../app/controllers/' . $controllerName . ".php";
+        $directory = __DIR__ . '/../../app/controllers/' . $controllerName . 'Controller' . ".php";
 
         if (self::isExist($controllerName)) {
 
         } else {
-            $controllerFileTemplet = fopen("Controller.txt", "r");
+            $controllerFileTemplet = fopen(__DIR__ ."/controller.txt", "r");
             $contents = stream_get_contents($controllerFileTemplet);
+
            
             $contents = str_replace("{{ControllerName}}", $controllerName, $contents);
 
@@ -39,7 +40,7 @@ class ControllerMaker
 
     static function createFuction($action)
     {
-        $actionFileTemplet = fopen("action.txt", "r");
+        $actionFileTemplet = fopen(__DIR__ ."/action.txt", "r");
 
         $function = stream_get_contents($actionFileTemplet);
         $function = str_replace("{{ActionName}}", $action, $function);
